@@ -19,4 +19,5 @@ Requires **Node.js 22.5+** (uses built-in `node:sqlite`).
 node server.js
 ```
 
-Then open **http://localhost:3000** in your browser.
+Then open **http://localhost:4000** in your browser.
+

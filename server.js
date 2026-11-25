@@ -4,7 +4,7 @@ const path = require('node:path');
 const { URL } = require('node:url');
 const { db, clearAllData } = require('./db');
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
 const MIME_TYPES = {
@@ -44,7 +44,14 @@ function readBody(req) {
 }
 
 function serveStatic(res, pathname) {
-  const safePath = pathname === '/' ? '/index.html' : pathname;
+  if (pathname === '/favicon.ico') {
+    res.writeHead(204);
+    return res.end();
+  }
+  let safePath = pathname === '/' ? '/index.html' : pathname;
+  if (!path.extname(safePath)) {
+    safePath = `${safePath}.html`;
+  }
   const resolved = path.normalize(path.join(PUBLIC_DIR, safePath));
   if (!resolved.startsWith(PUBLIC_DIR)) {
     res.writeHead(403);

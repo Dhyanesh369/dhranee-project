@@ -394,8 +394,12 @@
 
         const pSelect = document.getElementById('rec-patient');
         const vSelect = document.getElementById('rec-vaccine');
-        pSelect.innerHTML = patients.map((p) => `<option value="${p.id}">${escapeHtml(p.patient_code)} — ${escapeHtml(p.full_name)}</option>`).join('');
-        vSelect.innerHTML = vaccines.map((v) => `<option value="${v.id}">${escapeHtml(v.vaccine_code)} — ${escapeHtml(v.vaccine_name)}</option>`).join('');
+        pSelect.innerHTML = patients.length
+          ? patients.map((p) => `<option value="${p.id}">${escapeHtml(p.patient_code)} — ${escapeHtml(p.full_name)}</option>`).join('')
+          : '<option value="">-- Add patients in Module 1 first --</option>';
+        vSelect.innerHTML = vaccines.length
+          ? vaccines.map((v) => `<option value="${v.id}">${escapeHtml(v.vaccine_code)} — ${escapeHtml(v.vaccine_name)}</option>`).join('')
+          : '<option value="">-- Add vaccines in Module 1 first --</option>';
 
         renderDonutChart(s);
         renderPatientChart(analysis.patientSummary);
