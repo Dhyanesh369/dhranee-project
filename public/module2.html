@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 2: Cartesian Product A × B — MedSet Analyzer</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">+</div>
+        <div class="brand-text">
+          <h1>MedSet Analyzer</h1>
+          <span>Hospital Vaccination System</span>
+        </div>
+      </div>
+      <div class="nav-label">Navigation</div>
+      <nav class="nav-links">
+        <a href="/index.html" class="nav-link" data-page="home">
+          <span>Home &amp; Dashboard</span>
+        </a>
+        <a href="/module1.html" class="nav-link" data-page="module1">
+          <span>Module 1: Input &amp; Sets</span>
+          <span class="nav-badge" id="badge-m1">A, B</span>
+        </a>
+        <a href="/module2.html" class="nav-link" data-page="module2">
+          <span>Module 2: Cartesian Product</span>
+          <span class="nav-badge" id="badge-m2">A × B</span>
+        </a>
+        <a href="/module3.html" class="nav-link" data-page="module3">
+          <span>Module 3: Analysis &amp; Charts</span>
+          <span class="nav-badge" id="badge-m3">R</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <strong>Module 2 Objective</strong>
+        Generate A × B = { (p, v) | p ∈ A, v ∈ B } and calculate total combinations |A| × |B|.
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button id="mobile-menu-btn" class="mobile-menu-btn">Menu</button>
+          <div class="topbar-title">
+            <h2>Module 2: Cartesian Product &amp; Pair Mapping</h2>
+            <p>All possible patient–vaccine ordered pairs generated from Set A × Set B</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button id="refresh-btn" class="btn btn-secondary">Regenerate A × B</button>
+          <a href="/module3.html" class="btn btn-primary">Compare with Records &rarr;</a>
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="formula-banner">
+          <div>
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--primary-dark);letter-spacing:0.05em;">
+              Cartesian Product Cardinality
+            </div>
+            <div class="formula-eq" id="formula-text">|A × B| = |A| × |B| = 0 × 0 = 0</div>
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <span class="badge badge-teal">|A| Patients: <strong id="count-a">0</strong></span>
+            <span class="badge badge-info">|B| Vaccines: <strong id="count-b">0</strong></span>
+            <span class="badge badge-success">Ordered Pairs: <strong id="count-total">0</strong></span>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Generated Ordered Pairs (A × B)</h3>
+              <p class="card-subtitle">Every possible patient–vaccine combination</p>
+            </div>
+            <div class="toolbar">
+              <input id="search-input" placeholder="Filter by patient or vaccine..." style="width:240px;" />
+              <div class="tab-group">
+                <button class="tab-btn active" data-view="table">Ordered Pairs Table</button>
+                <button class="tab-btn" data-view="matrix">Matrix Grid</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="table-view" class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Pair #</th>
+                  <th>Ordered Pair (p, v)</th>
+                  <th>Patient (Set A)</th>
+                  <th>Vaccine (Set B)</th>
+                  <th>Target Disease</th>
+                  <th>Descriptive Mapping</th>
+                </tr>
+              </thead>
+              <tbody id="pairs-table-body">
+                <tr><td colspan="6">Generating Cartesian Product...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div id="matrix-view" class="table-wrap" style="display:none;">
+            <table id="matrix-table"></table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+  <script>
+    initSidebar('module2');
+
+    let cartesianData = null;
+    let activeView = 'table';
+
+    function renderPairsTable() {
+      if (!cartesianData) return;
+      const query = document.getElementById('search-input').value.trim().toLowerCase();
+      const filtered = cartesianData.pairs.filter((p) =>
+        p.patient_code.toLowerCase().includes(query) ||
+        p.full_name.toLowerCase().includes(query) ||
+        p.vaccine_code.toLowerCase().includes(query) ||
+        p.vaccine_name.toLowerCase().includes(query)
+      );
+
+      const tbody = document.getElementById('pairs-table-body');
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="6">No matching pairs found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((pair) => `
+        <tr>
+          <td><strong>#${pair.pairIndex}</strong></td>
+          <td><span class="code-pill">${escapeHtml(pair.orderedPair)}</span></td>
+          <td><strong>${escapeHtml(pair.full_name)}</strong> <span class="code-pill">${escapeHtml(pair.patient_code)}</span></td>
+          <td><strong>${escapeHtml(pair.vaccine_name)}</strong> <span class="code-pill">${escapeHtml(pair.vaccine_code)}</span></td>
+          <td>${escapeHtml(pair.target_disease || '—')}</td>
+          <td style="color:var(--text-muted);font-size:13px;">${escapeHtml(pair.labelPair)}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderMatrix() {
+      if (!cartesianData) return;
+      const { setA, setB } = cartesianData;
+      const table = document.getElementById('matrix-table');
+      if (!setA.length || !setB.length) {
+        table.innerHTML = '<tbody><tr><td style="padding:16px;">Add both patients and vaccines in Module 1 to render the matrix.</td></tr></tbody>';
+        return;
+      }
+
+      const header = `
+        <thead>
+          <tr>
+            <th>Set A \\ Set B</th>
+            ${setB.map((v) => `<th>${escapeHtml(v.vaccine_code)}<br><small style="font-weight:500;text-transform:none;">${escapeHtml(v.vaccine_name)}</small></th>`).join('')}
+          </tr>
+        </thead>
+      `;
+
+      const rows = setA.map((p) => `
+        <tr>
+          <td><strong>${escapeHtml(p.patient_code)}</strong><br><small style="color:var(--text-muted);">${escapeHtml(p.full_name)}</small></td>
+          ${setB.map((v) => `<td><span class="code-pill">(${escapeHtml(p.patient_code)}, ${escapeHtml(v.vaccine_code)})</span></td>`).join('')}
+        </tr>
+      `).join('');
+
+      table.innerHTML = header + `<tbody>${rows}</tbody>`;
+    }
+
+    async function loadCartesianProduct() {
+      try {
+        const [data, dash] = await Promise.all([
+          api('/api/cartesian-product'),
+          api('/api/dashboard')
+        ]);
+        cartesianData = data;
+
+        document.getElementById('count-a').textContent = data.cardinalityA;
+        document.getElementById('count-b').textContent = data.cardinalityB;
+        document.getElementById('count-total').textContent = data.totalCombinations;
+        document.getElementById('formula-text').textContent =
+          `|A × B| = |A| × |B| = ${data.cardinalityA} × ${data.cardinalityB} = ${data.totalCombinations}`;
+
+        document.getElementById('badge-m1').textContent = `${data.cardinalityA}, ${data.cardinalityB}`;
+        document.getElementById('badge-m2').textContent = `${data.totalCombinations}`;
+        document.getElementById('badge-m3').textContent = `${dash.vaccinatedCount}`;
+
+        renderPairsTable();
+        renderMatrix();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    }
+
+    document.getElementById('search-input').addEventListener('input', renderPairsTable);
+    document.getElementById('refresh-btn').addEventListener('click', () => {
+      loadCartesianProduct().then(() => showToast('Cartesian product A × B regenerated'));
+    });
+
+    document.querySelectorAll('.tab-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeView = btn.dataset.view;
+        document.getElementById('table-view').style.display = activeView === 'table' ? 'block' : 'none';
+        document.getElementById('matrix-view').style.display = activeView === 'matrix' ? 'block' : 'none';
+      });
+    });
+
+    loadCartesianProduct();
+  </script>
+</body>
+</html>
+

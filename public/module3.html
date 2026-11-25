@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 3: Relationship Analysis &amp; Visualization — MedSet Analyzer</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">+</div>
+        <div class="brand-text">
+          <h1>MedSet Analyzer</h1>
+          <span>Hospital Vaccination System</span>
+        </div>
+      </div>
+      <div class="nav-label">Navigation</div>
+      <nav class="nav-links">
+        <a href="/index.html" class="nav-link" data-page="home">
+          <span>Home &amp; Dashboard</span>
+        </a>
+        <a href="/module1.html" class="nav-link" data-page="module1">
+          <span>Module 1: Input &amp; Sets</span>
+          <span class="nav-badge" id="badge-m1">A, B</span>
+        </a>
+        <a href="/module2.html" class="nav-link" data-page="module2">
+          <span>Module 2: Cartesian Product</span>
+          <span class="nav-badge" id="badge-m2">A × B</span>
+        </a>
+        <a href="/module3.html" class="nav-link" data-page="module3">
+          <span>Module 3: Analysis &amp; Charts</span>
+          <span class="nav-badge" id="badge-m3">R</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <strong>Module 3 Objective</strong>
+        Compare actual vaccination records R against A × B to identify gaps and visualize coverage.
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button id="mobile-menu-btn" class="mobile-menu-btn">Menu</button>
+          <div class="topbar-title">
+            <h2>Module 3: Relationship Analysis &amp; Result Visualization</h2>
+            <p>Compare actual vaccination records R against A × B, inspect patient coverage, and export reports</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button id="export-csv-btn" class="btn btn-secondary">Export CSV</button>
+          <button onclick="window.print()" class="btn btn-primary">Print Summary Report</button>
+        </div>
+      </header>
+
+      <main class="content">
+        <!-- Summary KPIs -->
+        <section class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Cartesian Space |A × B|</div>
+            <div class="kpi-value" id="sum-total">0</div>
+            <div class="kpi-meta" id="sum-formula">0 × 0 pairs</div>
+          </div>
+          <div class="kpi-card green">
+            <div class="kpi-label">Vaccinated Pairs |R|</div>
+            <div class="kpi-value" id="sum-vaccinated">0</div>
+            <div class="kpi-meta">Recorded in database</div>
+          </div>
+          <div class="kpi-card amber">
+            <div class="kpi-label">Unrecorded Pairs |(A × B) \ R|</div>
+            <div class="kpi-value" id="sum-unrecorded">0</div>
+            <div class="kpi-meta">Pending / missing combinations</div>
+          </div>
+          <div class="kpi-card blue">
+            <div class="kpi-label">Overall Coverage</div>
+            <div class="kpi-value" id="sum-coverage">0%</div>
+            <div class="kpi-meta">Relation density |R| / |A × B|</div>
+          </div>
+        </section>
+
+        <!-- Charts Row -->
+        <section class="grid-3">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Relation Breakdown</h3>
+                <p class="card-subtitle">Vaccinated (R) vs. Unrecorded</p>
+              </div>
+            </div>
+            <div id="donut-chart" style="display:flex;flex-direction:column;align-items:center;gap:12px;"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Patient-Wise Coverage</h3>
+                <p class="card-subtitle">% of vaccines completed per patient</p>
+              </div>
+            </div>
+            <div id="patient-chart"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Vaccine-Wise Uptake</h3>
+                <p class="card-subtitle">Patients vaccinated per vaccine</p>
+              </div>
+            </div>
+            <div id="vaccine-chart"></div>
+          </div>
+        </section>
+
+        <!-- Record Actual Vaccination Form -->
+        <section class="card no-print">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Store Actual Vaccination Record (Add to Relation R)</h3>
+              <p class="card-subtitle">Select a patient from Set A and a vaccine from Set B to record an administered dose</p>
+            </div>
+          </div>
+          <form id="record-form" class="form-grid" style="grid-template-columns:repeat(3,minmax(0,1fr));">
+            <div class="form-group">
+              <label for="rec-patient">Patient (Set A) *</label>
+              <select id="rec-patient" required></select>
+            </div>
+            <div class="form-group">
+              <label for="rec-vaccine">Vaccine (Set B) *</label>
+              <select id="rec-vaccine" required></select>
+            </div>
+            <div class="form-group">
+              <label for="rec-date">Vaccination Date *</label>
+              <input id="rec-date" type="date" required />
+            </div>
+            <div class="form-group">
+              <label for="rec-dose">Dose Number</label>
+              <input id="rec-dose" type="number" min="1" max="10" value="1" />
+            </div>
+            <div class="form-group">
+              <label for="rec-clinician">Administered By</label>
+              <input id="rec-clinician" placeholder="e.g. Dr. Meera Rao" />
+            </div>
+            <div class="form-group">
+              <label for="rec-notes">Clinical Notes</label>
+              <input id="rec-notes" placeholder="e.g. No adverse reaction" />
+            </div>
+            <div class="form-group full" style="margin-top:4px;">
+              <button type="submit" class="btn btn-primary">Record Vaccination</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Comparison Table: A x B vs R -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Cartesian Product vs. Actual Records Comparison</h3>
+              <p class="card-subtitle">Every pair in A × B classified as Vaccinated or Unrecorded</p>
+            </div>
+            <div class="toolbar no-print">
+              <input id="comp-search" placeholder="Search patient or vaccine..." style="width:220px;" />
+              <div class="tab-group">
+                <button class="tab-btn active" data-filter="all">All</button>
+                <button class="tab-btn" data-filter="Vaccinated">Vaccinated</button>
+                <button class="tab-btn" data-filter="Unrecorded">Unrecorded</button>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Ordered Pair</th>
+                  <th>Patient</th>
+                  <th>Vaccine</th>
+                  <th>Status</th>
+                  <th>Date / Dose</th>
+                  <th class="no-print">Action</th>
+                </tr>
+              </thead>
+              <tbody id="comparison-table-body">
+                <tr><td colspan="7">Loading analysis...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Patient-Wise Vaccination Information -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Patient-Wise Vaccination Information</h3>
+              <p class="card-subtitle">Detailed breakdown of completed and pending vaccines for each patient</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Patient</th>
+                  <th>Completion</th>
+                  <th>Vaccinated Vaccines (∈ R)</th>
+                  <th>Unrecorded Vaccines (∉ R)</th>
+                </tr>
+              </thead>
+              <tbody id="patient-wise-body">
+                <tr><td colspan="4">Loading patient breakdown...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+  <script>
+    initSidebar('module3');
+
+    let analysisData = null;
+    let activeFilter = 'all';
+
+    document.getElementById('rec-date').valueAsDate = new Date();
+
+    function renderDonutChart(summary) {
+      const container = document.getElementById('donut-chart');
+      const total = summary.totalCombinations || 1;
+      const vac = summary.vaccinatedCount;
+      const unrec = summary.unrecordedCount;
+      const radius = 58;
+      const circumference = 2 * Math.PI * radius;
+      const vacLen = (vac / total) * circumference;
+
+      container.innerHTML = `
+        <svg width="160" height="160" viewBox="0 0 160 160" aria-label="Vaccinated vs Unrecorded Donut Chart">
+          <circle cx="80" cy="80" r="${radius}" fill="none" stroke="#fef3c7" stroke-width="20"></circle>
+          <circle cx="80" cy="80" r="${radius}" fill="none" stroke="#059669" stroke-width="20"
+            stroke-dasharray="${vacLen} ${circumference}"
+            transform="rotate(-90 80 80)" stroke-linecap="round"></circle>
+          <text x="80" y="76" text-anchor="middle" font-size="22" font-weight="800" fill="#0f172a">${summary.coveragePercent}%</text>
+          <text x="80" y="96" text-anchor="middle" font-size="11" font-weight="600" fill="#64748b">Coverage</text>
+        </svg>
+        <div style="display:flex;gap:14px;font-size:12.5px;font-weight:600;">
+          <span style="color:var(--success);">● Vaccinated (${vac})</span>
+          <span style="color:var(--warning);">● Unrecorded (${unrec})</span>
+        </div>
+      `;
+    }
+
+    function renderPatientChart(patientSummary) {
+      const container = document.getElementById('patient-chart');
+      if (!patientSummary.length) {
+        container.innerHTML = '<p style="font-size:13px;color:var(--text-muted);">No patient data available.</p>';
+        return;
+      }
+      container.innerHTML = patientSummary.map((p) => `
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:600;margin-bottom:4px;">
+            <span>${escapeHtml(p.fullName)} (${escapeHtml(p.patientCode)})</span>
+            <span>${p.vaccinatedCount}/${p.totalVaccines} (${p.coveragePercent}%)</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width:${p.coveragePercent}%;"></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderVaccineChart(vaccineSummary, totalPatients) {
+      const container = document.getElementById('vaccine-chart');
+      if (!vaccineSummary.length) {
+        container.innerHTML = '<p style="font-size:13px;color:var(--text-muted);">No vaccine data available.</p>';
+        return;
+      }
+      const maxVal = Math.max(totalPatients, 1);
+      container.innerHTML = vaccineSummary.map((v) => {
+        const pct = Math.round((v.vaccinatedPatients / maxVal) * 100);
+        return `
+          <div style="margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:600;margin-bottom:4px;">
+              <span>${escapeHtml(v.vaccineName)}</span>
+              <span>${v.vaccinatedPatients}/${totalPatients} patients</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" style="width:${pct}%;background:var(--secondary);"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderComparisonTable() {
+      if (!analysisData) return;
+      const query = document.getElementById('comp-search').value.trim().toLowerCase();
+      const rows = analysisData.comparisons.filter((c) => {
+        const matchesFilter = activeFilter === 'all' || c.status === activeFilter;
+        const matchesQuery =
+          c.patientCode.toLowerCase().includes(query) ||
+          c.patientName.toLowerCase().includes(query) ||
+          c.vaccineCode.toLowerCase().includes(query) ||
+          c.vaccineName.toLowerCase().includes(query);
+        return matchesFilter && matchesQuery;
+      });
+
+      const tbody = document.getElementById('comparison-table-body');
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="7">No matching combinations found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = rows.map((c) => {
+        const isVac = c.status === 'Vaccinated';
+        return `
+          <tr>
+            <td><strong>#${c.pairIndex}</strong></td>
+            <td><span class="code-pill">${escapeHtml(c.orderedPair)}</span></td>
+            <td><strong>${escapeHtml(c.patientName)}</strong></td>
+            <td>${escapeHtml(c.vaccineName)}</td>
+            <td>
+              <span class="badge ${isVac ? 'badge-success' : 'badge-warning'}">
+                ${isVac ? 'Vaccinated' : 'Unrecorded'}
+              </span>
+            </td>
+            <td>
+              ${isVac
+                ? `${escapeHtml(c.record.vaccinated_date)} (Dose ${escapeHtml(c.record.dose_number)})`
+                : '<span style="color:var(--text-light);">Not yet recorded</span>'}
+            </td>
+            <td class="no-print">
+              ${isVac
+                ? `<button class="btn btn-danger btn-sm" onclick="deleteRecord(${c.record.id})">Remove</button>`
+                : `<button class="btn btn-primary btn-sm" onclick="prefillVaccination(${c.patientId}, ${c.vaccineId})">Mark Vaccinated</button>`}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderPatientWise() {
+      if (!analysisData) return;
+      const tbody = document.getElementById('patient-wise-body');
+      if (!analysisData.patientSummary.length) {
+        tbody.innerHTML = '<tr><td colspan="4">No patients registered.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = analysisData.patientSummary.map((p) => `
+        <tr>
+          <td>
+            <strong>${escapeHtml(p.fullName)}</strong><br>
+            <span class="code-pill">${escapeHtml(p.patientCode)}</span>
+            <small style="color:var(--text-muted);"> • ${escapeHtml(p.age)} yrs, ${escapeHtml(p.gender)}</small>
+          </td>
+          <td style="min-width:150px;">
+            <div style="font-weight:700;font-size:13px;margin-bottom:4px;">${p.vaccinatedCount} / ${p.totalVaccines} (${p.coveragePercent}%)</div>
+            <div class="progress-track"><div class="progress-fill" style="width:${p.coveragePercent}%;"></div></div>
+          </td>
+          <td>
+            ${p.vaccinatedList.length
+              ? p.vaccinatedList.map((v) => `<span class="badge badge-success" style="margin:2px;">${escapeHtml(v.vaccineName)} (D${escapeHtml(v.doseNumber)})</span>`).join(' ')
+              : '<span style="color:var(--text-light);font-size:13px;">None</span>'}
+          </td>
+          <td>
+            ${p.unrecordedList.length
+              ? p.unrecordedList.map((v) => `<span class="badge badge-warning" style="margin:2px;">${escapeHtml(v.vaccineName)}</span>`).join(' ')
+              : '<span class="badge badge-teal">All Completed</span>'}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function loadAnalysis() {
+      try {
+        const [analysis, patients, vaccines] = await Promise.all([
+          api('/api/analysis'),
+          api('/api/patients'),
+          api('/api/vaccines')
+        ]);
+        analysisData = analysis;
+        const s = analysis.summary;
+
+        document.getElementById('sum-total').textContent = s.totalCombinations;
+        document.getElementById('sum-formula').textContent = `${s.cardinalityA} × ${s.cardinalityB} pairs`;
+        document.getElementById('sum-vaccinated').textContent = s.vaccinatedCount;
+        document.getElementById('sum-unrecorded').textContent = s.unrecordedCount;
+        document.getElementById('sum-coverage').textContent = `${s.coveragePercent}%`;
+
+        document.getElementById('badge-m1').textContent = `${s.cardinalityA}, ${s.cardinalityB}`;
+        document.getElementById('badge-m2').textContent = `${s.totalCombinations}`;
+        document.getElementById('badge-m3').textContent = `${s.vaccinatedCount}`;
+
+        const pSelect = document.getElementById('rec-patient');
+        const vSelect = document.getElementById('rec-vaccine');
+        pSelect.innerHTML = patients.map((p) => `<option value="${p.id}">${escapeHtml(p.patient_code)} — ${escapeHtml(p.full_name)}</option>`).join('');
+        vSelect.innerHTML = vaccines.map((v) => `<option value="${v.id}">${escapeHtml(v.vaccine_code)} — ${escapeHtml(v.vaccine_name)}</option>`).join('');
+
+        renderDonutChart(s);
+        renderPatientChart(analysis.patientSummary);
+        renderVaccineChart(analysis.vaccineSummary, s.cardinalityA);
+        renderComparisonTable();
+        renderPatientWise();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    }
+
+    window.prefillVaccination = function (patientId, vaccineId) {
+      document.getElementById('rec-patient').value = patientId;
+      document.getElementById('rec-vaccine').value = vaccineId;
+      document.getElementById('record-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      showToast('Selected unrecorded pair — confirm details and click Record Vaccination');
+    };
+
+    window.deleteRecord = async function (recordId) {
+      if (!confirm('Remove this vaccination record? The pair will return to Unrecorded.')) return;
+      try {
+        await api(`/api/records/${recordId}`, { method: 'DELETE' });
+        showToast('Vaccination record removed');
+        await loadAnalysis();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    };
+
+    document.getElementById('record-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        patient_id: document.getElementById('rec-patient').value,
+        vaccine_id: document.getElementById('rec-vaccine').value,
+        vaccinated_date: document.getElementById('rec-date').value,
+        dose_number: document.getElementById('rec-dose').value,
+        administered_by: document.getElementById('rec-clinician').value,
+        notes: document.getElementById('rec-notes').value
+      };
+      try {
+        await api('/api/records', { method: 'POST', body: payload });
+        showToast('Vaccination recorded in Relation R');
+        document.getElementById('rec-clinician').value = '';
+        document.getElementById('rec-notes').value = '';
+        await loadAnalysis();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    });
+
+    document.getElementById('comp-search').addEventListener('input', renderComparisonTable);
+    document.querySelectorAll('.tab-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        renderComparisonTable();
+      });
+    });
+
+    document.getElementById('export-csv-btn').addEventListener('click', () => {
+      if (!analysisData) return;
+      const headers = ['Pair #', 'Ordered Pair', 'Patient Code', 'Patient Name', 'Vaccine Code', 'Vaccine Name', 'Status', 'Date', 'Dose'];
+      const lines = [headers.join(',')];
+      for (const c of analysisData.comparisons) {
+        const row = [
+          c.pairIndex,
+          `"${c.orderedPair}"`,
+          `"${c.patientCode}"`,
+          `"${c.patientName}"`,
+          `"${c.vaccineCode}"`,
+          `"${c.vaccineName}"`,
+          c.status,
+          c.record ? c.record.vaccinated_date : '',
+          c.record ? c.record.dose_number : ''
+        ];
+        lines.push(row.join(','));
+      }
+      const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'vaccination_relationship_report.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    loadAnalysis();
+  </script>
+</body>
+</html>
+

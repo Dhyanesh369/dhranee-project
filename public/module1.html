@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 1: Database Input &amp; Set Formation — MedSet Analyzer</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">+</div>
+        <div class="brand-text">
+          <h1>MedSet Analyzer</h1>
+          <span>Hospital Vaccination System</span>
+        </div>
+      </div>
+      <div class="nav-label">Navigation</div>
+      <nav class="nav-links">
+        <a href="/index.html" class="nav-link" data-page="home">
+          <span>Home &amp; Dashboard</span>
+        </a>
+        <a href="/module1.html" class="nav-link" data-page="module1">
+          <span>Module 1: Input &amp; Sets</span>
+          <span class="nav-badge" id="badge-m1">A, B</span>
+        </a>
+        <a href="/module2.html" class="nav-link" data-page="module2">
+          <span>Module 2: Cartesian Product</span>
+          <span class="nav-badge" id="badge-m2">A × B</span>
+        </a>
+        <a href="/module3.html" class="nav-link" data-page="module3">
+          <span>Module 3: Analysis &amp; Charts</span>
+          <span class="nav-badge" id="badge-m3">R</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <strong>Module 1 Objective</strong>
+        Store Patient &amp; Vaccine records in SQLite and automatically form Set A and Set B.
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button id="mobile-menu-btn" class="mobile-menu-btn">Menu</button>
+          <div class="topbar-title">
+            <h2>Module 1: Database Input &amp; Set Formation</h2>
+            <p>Manage Patient records (Set A) and Vaccine records (Set B)</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <a href="/module2.html" class="btn btn-primary">Generate A × B &rarr;</a>
+        </div>
+      </header>
+
+      <main class="content">
+        <!-- Automatic Set Formation Display -->
+        <section class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Set A (Patients)</h3>
+                <p class="card-subtitle">Automatically formed from the <code>patients</code> table</p>
+              </div>
+              <span class="badge badge-teal">|A| = <span id="card-a">0</span></span>
+            </div>
+            <div class="set-box" id="set-a-display">Loading Set A...</div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Set B (Vaccines)</h3>
+                <p class="card-subtitle">Automatically formed from the <code>vaccines</code> table</p>
+              </div>
+              <span class="badge badge-info">|B| = <span id="card-b">0</span></span>
+            </div>
+            <div class="set-box" id="set-b-display">Loading Set B...</div>
+          </div>
+        </section>
+
+        <!-- Input Forms -->
+        <section class="grid-2">
+          <!-- Patient Form -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title" id="patient-form-title">Add Patient (Set A)</h3>
+                <p class="card-subtitle">Enter patient demographics to store in database</p>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" id="patient-reset-btn" style="display:none;">Cancel Edit</button>
+            </div>
+            <form id="patient-form" class="form-grid">
+              <input type="hidden" id="patient-id" />
+              <div class="form-group">
+                <label for="patient-code">Patient ID / Code *</label>
+                <input id="patient-code" placeholder="e.g. P-106" required />
+              </div>
+              <div class="form-group">
+                <label for="patient-name">Full Name *</label>
+                <input id="patient-name" placeholder="e.g. Kavya Reddy" required />
+              </div>
+              <div class="form-group">
+                <label for="patient-age">Age *</label>
+                <input id="patient-age" type="number" min="0" max="120" placeholder="e.g. 28" required />
+              </div>
+              <div class="form-group">
+                <label for="patient-gender">Gender *</label>
+                <select id="patient-gender" required>
+                  <option value="">Select gender</option>
+                  <option value="Female">Female</option>
+                  <option value="Male">Male</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="patient-blood">Blood Group</label>
+                <select id="patient-blood">
+                  <option value="">Select blood group</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="patient-phone">Phone Number</label>
+                <input id="patient-phone" placeholder="e.g. 9876543210" />
+              </div>
+              <div class="form-group full" style="margin-top:4px;">
+                <button type="submit" class="btn btn-primary" id="patient-submit-btn">Save Patient</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Vaccine Form -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title" id="vaccine-form-title">Add Vaccine (Set B)</h3>
+                <p class="card-subtitle">Enter vaccine details to store in database</p>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" id="vaccine-reset-btn" style="display:none;">Cancel Edit</button>
+            </div>
+            <form id="vaccine-form" class="form-grid">
+              <input type="hidden" id="vaccine-id" />
+              <div class="form-group">
+                <label for="vaccine-code">Vaccine Code *</label>
+                <input id="vaccine-code" placeholder="e.g. V-205" required />
+              </div>
+              <div class="form-group">
+                <label for="vaccine-name">Vaccine Name *</label>
+                <input id="vaccine-name" placeholder="e.g. Covaxin" required />
+              </div>
+              <div class="form-group">
+                <label for="vaccine-manufacturer">Manufacturer</label>
+                <input id="vaccine-manufacturer" placeholder="e.g. Bharat Biotech" />
+              </div>
+              <div class="form-group">
+                <label for="vaccine-doses">Doses Required</label>
+                <input id="vaccine-doses" type="number" min="1" max="10" value="1" />
+              </div>
+              <div class="form-group full">
+                <label for="vaccine-disease">Target Disease</label>
+                <input id="vaccine-disease" placeholder="e.g. COVID-19" />
+              </div>
+              <div class="form-group full" style="margin-top:4px;">
+                <button type="submit" class="btn btn-primary" id="vaccine-submit-btn">Save Vaccine</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- Stored Records Tables -->
+        <section class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Patients Database Table</h3>
+              <span class="badge badge-teal" id="patients-count-pill">0 records</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Age / Gender</th>
+                    <th>Blood</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="patients-table-body">
+                  <tr><td colspan="5">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Vaccines Database Table</h3>
+              <span class="badge badge-info" id="vaccines-count-pill">0 records</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Vaccine</th>
+                    <th>Target Disease</th>
+                    <th>Doses</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="vaccines-table-body">
+                  <tr><td colspan="5">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+  <script>
+    initSidebar('module1');
+
+    let patientsList = [];
+    let vaccinesList = [];
+
+    function renderSetFormation() {
+      document.getElementById('card-a').textContent = patientsList.length;
+      document.getElementById('card-b').textContent = vaccinesList.length;
+      document.getElementById('badge-m1').textContent = `${patientsList.length}, ${vaccinesList.length}`;
+      document.getElementById('badge-m2').textContent = `${patientsList.length * vaccinesList.length}`;
+
+      const setADiv = document.getElementById('set-a-display');
+      if (!patientsList.length) {
+        setADiv.textContent = 'A = ∅ (empty set)';
+      } else {
+        setADiv.innerHTML = '<strong>A = {</strong> ' +
+          patientsList.map((p) => `<span class="set-chip">${escapeHtml(p.patient_code)}: ${escapeHtml(p.full_name)}</span>`).join('') +
+          ' <strong>}</strong>';
+      }
+
+      const setBDiv = document.getElementById('set-b-display');
+      if (!vaccinesList.length) {
+        setBDiv.textContent = 'B = ∅ (empty set)';
+      } else {
+        setBDiv.innerHTML = '<strong>B = {</strong> ' +
+          vaccinesList.map((v) => `<span class="set-chip">${escapeHtml(v.vaccine_code)}: ${escapeHtml(v.vaccine_name)}</span>`).join('') +
+          ' <strong>}</strong>';
+      }
+    }
+
+    function renderTables() {
+      document.getElementById('patients-count-pill').textContent = `${patientsList.length} records`;
+      document.getElementById('vaccines-count-pill').textContent = `${vaccinesList.length} records`;
+
+      const pBody = document.getElementById('patients-table-body');
+      pBody.innerHTML = patientsList.length
+        ? patientsList.map((p) => `
+          <tr>
+            <td><span class="code-pill">${escapeHtml(p.patient_code)}</span></td>
+            <td><strong>${escapeHtml(p.full_name)}</strong></td>
+            <td>${escapeHtml(p.age)} / ${escapeHtml(p.gender)}</td>
+            <td>${escapeHtml(p.blood_group || '—')}</td>
+            <td>
+              <div style="display:flex;gap:6px;">
+                <button class="btn btn-secondary btn-sm" onclick="editPatient(${p.id})">Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="deletePatient(${p.id})">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `).join('')
+        : '<tr><td colspan="5">No patients added yet.</td></tr>';
+
+      const vBody = document.getElementById('vaccines-table-body');
+      vBody.innerHTML = vaccinesList.length
+        ? vaccinesList.map((v) => `
+          <tr>
+            <td><span class="code-pill">${escapeHtml(v.vaccine_code)}</span></td>
+            <td><strong>${escapeHtml(v.vaccine_name)}</strong></td>
+            <td>${escapeHtml(v.target_disease || '—')}</td>
+            <td>${escapeHtml(v.doses_required)}</td>
+            <td>
+              <div style="display:flex;gap:6px;">
+                <button class="btn btn-secondary btn-sm" onclick="editVaccine(${v.id})">Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteVaccine(${v.id})">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `).join('')
+        : '<tr><td colspan="5">No vaccines added yet.</td></tr>';
+    }
+
+    async function loadData() {
+      try {
+        const [patients, vaccines, dash] = await Promise.all([
+          api('/api/patients'),
+          api('/api/vaccines'),
+          api('/api/dashboard')
+        ]);
+        patientsList = patients;
+        vaccinesList = vaccines;
+        document.getElementById('badge-m3').textContent = `${dash.vaccinatedCount}`;
+        renderSetFormation();
+        renderTables();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    }
+
+    function resetPatientForm() {
+      document.getElementById('patient-form').reset();
+      document.getElementById('patient-id').value = '';
+      document.getElementById('patient-form-title').textContent = 'Add Patient (Set A)';
+      document.getElementById('patient-submit-btn').textContent = 'Save Patient';
+      document.getElementById('patient-reset-btn').style.display = 'none';
+    }
+
+    function resetVaccineForm() {
+      document.getElementById('vaccine-form').reset();
+      document.getElementById('vaccine-id').value = '';
+      document.getElementById('vaccine-doses').value = '1';
+      document.getElementById('vaccine-form-title').textContent = 'Add Vaccine (Set B)';
+      document.getElementById('vaccine-submit-btn').textContent = 'Save Vaccine';
+      document.getElementById('vaccine-reset-btn').style.display = 'none';
+    }
+
+    window.editPatient = function (id) {
+      const p = patientsList.find((item) => item.id === id);
+      if (!p) return;
+      document.getElementById('patient-id').value = p.id;
+      document.getElementById('patient-code').value = p.patient_code;
+      document.getElementById('patient-name').value = p.full_name;
+      document.getElementById('patient-age').value = p.age;
+      document.getElementById('patient-gender').value = p.gender;
+      document.getElementById('patient-blood').value = p.blood_group || '';
+      document.getElementById('patient-phone').value = p.phone || '';
+      document.getElementById('patient-form-title').textContent = `Edit Patient (${p.patient_code})`;
+      document.getElementById('patient-submit-btn').textContent = 'Update Patient';
+      document.getElementById('patient-reset-btn').style.display = 'inline-flex';
+    };
+
+    window.deletePatient = async function (id) {
+      if (!confirm('Delete this patient and their vaccination records?')) return;
+      try {
+        await api(`/api/patients/${id}`, { method: 'DELETE' });
+        showToast('Patient deleted from Set A');
+        await loadData();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    };
+
+    window.editVaccine = function (id) {
+      const v = vaccinesList.find((item) => item.id === id);
+      if (!v) return;
+      document.getElementById('vaccine-id').value = v.id;
+      document.getElementById('vaccine-code').value = v.vaccine_code;
+      document.getElementById('vaccine-name').value = v.vaccine_name;
+      document.getElementById('vaccine-manufacturer').value = v.manufacturer || '';
+      document.getElementById('vaccine-doses').value = v.doses_required;
+      document.getElementById('vaccine-disease').value = v.target_disease || '';
+      document.getElementById('vaccine-form-title').textContent = `Edit Vaccine (${v.vaccine_code})`;
+      document.getElementById('vaccine-submit-btn').textContent = 'Update Vaccine';
+      document.getElementById('vaccine-reset-btn').style.display = 'inline-flex';
+    };
+
+    window.deleteVaccine = async function (id) {
+      if (!confirm('Delete this vaccine and its vaccination records?')) return;
+      try {
+        await api(`/api/vaccines/${id}`, { method: 'DELETE' });
+        showToast('Vaccine deleted from Set B');
+        await loadData();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    };
+
+    document.getElementById('patient-reset-btn').addEventListener('click', resetPatientForm);
+    document.getElementById('vaccine-reset-btn').addEventListener('click', resetVaccineForm);
+
+    document.getElementById('patient-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('patient-id').value;
+      const payload = {
+        patient_code: document.getElementById('patient-code').value,
+        full_name: document.getElementById('patient-name').value,
+        age: document.getElementById('patient-age').value,
+        gender: document.getElementById('patient-gender').value,
+        blood_group: document.getElementById('patient-blood').value,
+        phone: document.getElementById('patient-phone').value
+      };
+      try {
+        if (id) {
+          await api(`/api/patients/${id}`, { method: 'PUT', body: payload });
+          showToast('Patient updated successfully');
+        } else {
+          await api('/api/patients', { method: 'POST', body: payload });
+          showToast('Patient added to Set A');
+        }
+        resetPatientForm();
+        await loadData();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    });
+
+    document.getElementById('vaccine-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('vaccine-id').value;
+      const payload = {
+        vaccine_code: document.getElementById('vaccine-code').value,
+        vaccine_name: document.getElementById('vaccine-name').value,
+        manufacturer: document.getElementById('vaccine-manufacturer').value,
+        doses_required: document.getElementById('vaccine-doses').value,
+        target_disease: document.getElementById('vaccine-disease').value
+      };
+      try {
+        if (id) {
+          await api(`/api/vaccines/${id}`, { method: 'PUT', body: payload });
+          showToast('Vaccine updated successfully');
+        } else {
+          await api('/api/vaccines', { method: 'POST', body: payload });
+          showToast('Vaccine added to Set B');
+        }
+        resetVaccineForm();
+        await loadData();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    });
+
+    loadData();
+  </script>
+</body>
+</html>
+

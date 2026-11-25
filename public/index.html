@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Database Relationship Analyzer — Hospital Vaccination System</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">+</div>
+        <div class="brand-text">
+          <h1>MedSet Analyzer</h1>
+          <span>Hospital Vaccination System</span>
+        </div>
+      </div>
+      <div class="nav-label">Navigation</div>
+      <nav class="nav-links">
+        <a href="/index.html" class="nav-link" data-page="home">
+          <span>Home &amp; Dashboard</span>
+        </a>
+        <a href="/module1.html" class="nav-link" data-page="module1">
+          <span>Module 1: Input &amp; Sets</span>
+          <span class="nav-badge" id="badge-m1">A, B</span>
+        </a>
+        <a href="/module2.html" class="nav-link" data-page="module2">
+          <span>Module 2: Cartesian Product</span>
+          <span class="nav-badge" id="badge-m2">A × B</span>
+        </a>
+        <a href="/module3.html" class="nav-link" data-page="module3">
+          <span>Module 3: Analysis &amp; Charts</span>
+          <span class="nav-badge" id="badge-m3">R</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <strong>Relational Algebra Model</strong>
+        Set A (Patients) × Set B (Vaccines) compared against actual records R ⊆ A × B.
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button id="mobile-menu-btn" class="mobile-menu-btn">Menu</button>
+          <div class="topbar-title">
+            <h2>Hospital Vaccination Dashboard</h2>
+            <p>Clean overview of database sets, Cartesian product space, and vaccination coverage</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button id="clear-data-btn" class="btn btn-secondary">Clear All Data</button>
+          <a href="/module1.html" class="btn btn-primary">+ Add Patients &amp; Vaccines</a>
+        </div>
+      </header>
+
+      <main class="content">
+        <!-- Clean Clinical Project Header -->
+        <section class="clinical-header">
+          <div>
+            <span class="badge badge-teal" style="margin-bottom:10px;">Hospital Vaccination Management System</span>
+            <h2>Design and Development of a Database Relationship Analyzer Using Cartesian Products</h2>
+            <p>
+              Maps Patient Set <strong>A</strong> and Vaccine Set <strong>B</strong> into their full Cartesian Product
+              <strong>A × B</strong>, then evaluates actual clinical records <strong>R</strong> to highlight vaccinated and unrecorded combinations.
+            </p>
+          </div>
+          <div class="math-pill-box">
+            <div>Set A (Patients): <strong id="hero-a">0</strong></div>
+            <div>Set B (Vaccines): <strong id="hero-b">0</strong></div>
+            <div>|A × B| = |A| × |B| = <strong id="hero-axb">0</strong></div>
+            <div>Coverage |R| / |A × B|: <strong id="hero-cov" style="color:var(--primary-dark);">0%</strong></div>
+          </div>
+        </section>
+
+        <!-- 4 Clean KPI Cards -->
+        <section class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <div class="kpi-label">Total Patients |A|</div>
+              <div class="kpi-icon">A</div>
+            </div>
+            <div class="kpi-value" id="kpi-patients">0</div>
+            <div class="kpi-meta">Registered in Set A</div>
+          </div>
+          <div class="kpi-card blue">
+            <div class="kpi-top">
+              <div class="kpi-label">Total Vaccines |B|</div>
+              <div class="kpi-icon">B</div>
+            </div>
+            <div class="kpi-value" id="kpi-vaccines">0</div>
+            <div class="kpi-meta">Available in Set B</div>
+          </div>
+          <div class="kpi-card green">
+            <div class="kpi-top">
+              <div class="kpi-label">Vaccination Records |R|</div>
+              <div class="kpi-icon">R</div>
+            </div>
+            <div class="kpi-value" id="kpi-records">0</div>
+            <div class="kpi-meta" id="kpi-cov-meta">0% of A × B completed</div>
+          </div>
+          <div class="kpi-card amber">
+            <div class="kpi-top">
+              <div class="kpi-label">Possible Pairs |A × B|</div>
+              <div class="kpi-icon">×</div>
+            </div>
+            <div class="kpi-value" id="kpi-cartesian">0</div>
+            <div class="kpi-meta" id="kpi-unrecorded-meta">0 unrecorded pairs</div>
+          </div>
+        </section>
+
+        <!-- Clean 2-Column Insights + 3-Module Workflow -->
+        <section class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Patient Coverage Snapshot</h3>
+                <p class="card-subtitle">Live immunization progress across registered patients</p>
+              </div>
+              <a href="/module3.html" class="btn btn-secondary btn-sm">Full Charts</a>
+            </div>
+            <div id="dashboard-patient-snapshot">Loading patient coverage...</div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Project Modules</h3>
+                <p class="card-subtitle">Step-by-step relational database workflow</p>
+              </div>
+            </div>
+            <div class="workflow-list">
+              <a href="/module1.html" class="workflow-item">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div class="workflow-step-num">1</div>
+                  <div>
+                    <strong style="font-size:14px;">Database Input &amp; Set Formation</strong>
+                    <div style="font-size:12.5px;color:var(--text-muted);">Manage Patients (Set A) &amp; Vaccines (Set B) in SQLite</div>
+                  </div>
+                </div>
+                <span class="badge badge-teal" id="wf-m1">0 + 0</span>
+              </a>
+
+              <a href="/module2.html" class="workflow-item">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div class="workflow-step-num" style="background:var(--secondary);">2</div>
+                  <div>
+                    <strong style="font-size:14px;">Cartesian Product &amp; Pair Mapping</strong>
+                    <div style="font-size:12.5px;color:var(--text-muted);">Generate all ordered pairs A × B &amp; Matrix Grid</div>
+                  </div>
+                </div>
+                <span class="badge badge-info" id="wf-m2">0 pairs</span>
+              </a>
+
+              <a href="/module3.html" class="workflow-item">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div class="workflow-step-num" style="background:var(--success);">3</div>
+                  <div>
+                    <strong style="font-size:14px;">Relationship Analysis &amp; Visuals</strong>
+                    <div style="font-size:12.5px;color:var(--text-muted);">Compare R vs. A × B, inspect gaps &amp; print reports</div>
+                  </div>
+                </div>
+                <span class="badge badge-success" id="wf-m3">0%</span>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <!-- Clean Recent Sample Records Table -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Recent Vaccination Records (Relation R)</h3>
+              <p class="card-subtitle">Latest clinical records stored in the hospital database</p>
+            </div>
+            <a href="/module3.html" class="btn btn-secondary btn-sm">Manage All Records</a>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Patient</th>
+                  <th>Vaccine</th>
+                  <th>Ordered Pair</th>
+                  <th>Dose</th>
+                  <th>Date</th>
+                  <th>Clinician</th>
+                </tr>
+              </thead>
+              <tbody id="recent-records-body">
+                <tr><td colspan="6">Loading records...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+  <script>
+    initSidebar('home');
+
+    function initials(name) {
+      return String(name || '')
+        .split(' ')
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((n) => n[0].toUpperCase())
+        .join('');
+    }
+
+    async function loadDashboard() {
+      try {
+        const analysis = await api('/api/analysis');
+        const s = analysis.summary;
+
+        document.getElementById('kpi-patients').textContent = s.cardinalityA;
+        document.getElementById('kpi-vaccines').textContent = s.cardinalityB;
+        document.getElementById('kpi-records').textContent = s.vaccinatedCount;
+        document.getElementById('kpi-cartesian').textContent = s.totalCombinations;
+
+        document.getElementById('hero-a').textContent = s.cardinalityA;
+        document.getElementById('hero-b').textContent = s.cardinalityB;
+        document.getElementById('hero-axb').textContent = s.totalCombinations;
+        document.getElementById('hero-cov').textContent = `${s.coveragePercent}%`;
+
+        document.getElementById('kpi-cov-meta').textContent = `${s.coveragePercent}% of A × B completed`;
+        document.getElementById('kpi-unrecorded-meta').textContent = `${s.unrecordedCount} unrecorded pairs`;
+
+        document.getElementById('badge-m1').textContent = `${s.cardinalityA}, ${s.cardinalityB}`;
+        document.getElementById('badge-m2').textContent = `${s.totalCombinations}`;
+        document.getElementById('badge-m3').textContent = `${s.vaccinatedCount}`;
+
+        document.getElementById('wf-m1').textContent = `${s.cardinalityA} + ${s.cardinalityB}`;
+        document.getElementById('wf-m2').textContent = `${s.totalCombinations} pairs`;
+        document.getElementById('wf-m3').textContent = `${s.coveragePercent}%`;
+
+        const snapDiv = document.getElementById('dashboard-patient-snapshot');
+        if (!analysis.patientSummary.length) {
+          snapDiv.innerHTML = '<p style="font-size:13px;color:var(--text-muted);">No patient records found.</p>';
+        } else {
+          snapDiv.innerHTML = analysis.patientSummary.map((p) => `
+            <div style="margin-bottom:14px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;margin-bottom:5px;">
+                <span>${escapeHtml(p.fullName)} <span class="code-pill">${escapeHtml(p.patientCode)}</span></span>
+                <span style="color:var(--primary-dark);">${p.vaccinatedCount}/${p.totalVaccines} vaccines (${p.coveragePercent}%)</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:${p.coveragePercent}%;"></div>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        const recent = analysis.records.slice(0, 5);
+        const tbody = document.getElementById('recent-records-body');
+        if (!recent.length) {
+          tbody.innerHTML = '<tr><td colspan="6">No vaccination records yet.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = recent.map((r) => `
+          <tr>
+            <td>
+              <div class="patient-cell">
+                <span class="avatar">${escapeHtml(initials(r.full_name))}</span>
+                <div>
+                  <strong>${escapeHtml(r.full_name)}</strong>
+                  <div style="font-size:12px;color:var(--text-light);">${escapeHtml(r.patient_code)}</div>
+                </div>
+              </div>
+            </td>
+            <td><strong>${escapeHtml(r.vaccine_name)}</strong> <span class="code-pill">${escapeHtml(r.vaccine_code)}</span></td>
+            <td><span class="code-pill">(${escapeHtml(r.patient_code)}, ${escapeHtml(r.vaccine_code)})</span></td>
+            <td><span class="badge badge-info">Dose ${escapeHtml(r.dose_number)}</span></td>
+            <td>${escapeHtml(r.vaccinated_date)}</td>
+            <td>${escapeHtml(r.administered_by || '—')}</td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    }
+
+    document.getElementById('clear-data-btn').addEventListener('click', async () => {
+      if (!confirm('Clear all patients, vaccines, and vaccination records for a fresh start?')) return;
+      try {
+        await api('/api/clear-data', { method: 'POST' });
+        showToast('All database records cleared');
+        await loadDashboard();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    });
+
+    loadDashboard();
+  </script>
+</body>
+</html>
